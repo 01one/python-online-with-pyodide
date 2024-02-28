@@ -175,7 +175,7 @@
 
       let pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/" });
       console.log("Ready to run your program...");
-      // numpy and matplitlib package
+      // numpy and matplotlib package
       await pyodide.loadPackage(['numpy', 'matplotlib']);
       document.getElementById('spinner-container').style.display = 'none';
 
