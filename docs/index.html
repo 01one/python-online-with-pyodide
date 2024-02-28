@@ -1,4 +1,13 @@
 <!--************************************************************************************************************************************************************
+ * Project: Interactive Data Visualizer (With Pyodide, CodeMirror, and Semantic UI)
+ * Dates: February 2024
+ * Description: This project implements interactive visualization techniques using Python in Web Browser with , Pyodide, Matplotlib, and Semantic UI. 
+ * Author: Mashiur Rahman Mahid
+ * Notes: This project was a rewarding learning experience. I enjoyed discovering how smoothly Semantic UI's modal integration enhances Matplotlib visualizations. 
+ ***************************************************************************************************************************************************************-->
+
+
+<!--************************************************************************************************************************************************************
 
  * Project: Interactive Data Visualizer (With Pyodide, CodeMirror, and Semantic UI)
  * Dates: February 2024
@@ -115,18 +124,18 @@
 
   <div class="editor-container">
     <textarea id="code-editor">
-import matplotlib.pyplot as plt
-import numpy as np
-
-x = np.linspace(0, 10, 100)
-y = np.sin(x)
-
-plt.figure(figsize=(8, 6))
-plt.plot(x, y, 'b-', linewidth=2, label='Sine Wave')
-plt.xlabel('X-axis'), plt.ylabel('Y-axis'), plt.title('Simple Sine Wave Plot')
-plt.grid(True, linestyle='--', alpha=0.7), plt.legend()
-plt.show()      
-    </textarea>
+ import matplotlib.pyplot as plt
+ import numpy as np
+ 
+ x = np.linspace(0, 10, 100)
+ y = np.sin(x)
+ 
+ plt.figure(figsize=(8, 6))
+ plt.plot(x, y, 'b-', linewidth=2, label='Sine Wave')
+ plt.xlabel('X-axis'), plt.ylabel('Y-axis'), plt.title('Simple Sine Wave Plot')
+ plt.grid(True, linestyle='--', alpha=0.7), plt.legend()
+ plt.show()      
+     </textarea>
   </div>
 
   <button id="run-button">Run</button>
@@ -143,7 +152,9 @@ plt.show()
       Plot
     </div>
     <div class="image content">
-      <div id="plotContainer">
+      <div style="width: 100%; height: auto; text-align: center; overflow: hidden;">
+        <div id="plotContainer">
+        </div>
       </div>
     </div>
   </div>
@@ -210,7 +221,7 @@ plt.show()
 
 
       document.getElementById('clear-button').addEventListener('click', () => {
-        
+
         document.getElementById('consoleOutput').innerHTML = '';
       });
 
@@ -229,7 +240,7 @@ plt.show()
         let outputBox = document.getElementById('output-box-container');
         document.getElementById('spinner-container').style.display = 'None';
 
-        if (pyodide.globals.get('plt')) {  
+        if (pyodide.globals.get('plt')) {
           $('#plotModal').modal('show');
         } else {
           outputBox.textContent = output;
