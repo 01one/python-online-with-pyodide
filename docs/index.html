@@ -4,10 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+
 
     <style>
         body {
@@ -19,7 +21,41 @@
             margin-bottom: 20px;
         }
 
-        #run-button,#clear-button,
+        #spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #spinner-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(39, 39, 43, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        #run-button,
+        #clear-button,
+        #clear-editor,
         #terminate-button {
             background-color: #4CAF50;
             border: none;
@@ -55,6 +91,10 @@
 
 <body>
     <h1>Python Online Interpreter</h1>
+    <div id="spinner-container">
+        <div id="spinner"></div>
+    </div>
+
     <div class="editor-container">
         <textarea id="code-editor">print("Hello from Python!")</textarea>
     </div>
@@ -62,28 +102,31 @@
     <button id="run-button">Run</button>
     <button id="terminate-button">Terminate</button>
     <button id="clear-button">Clear Console</button>
+    <button id="clear-editor">Clear Editor</button>
     <div class="console-output" id="consoleOutput"></div>
     <div id="output-box-container"></div>
-        <script>
-            (function() {
-                var oldConsoleLog = console.log;
-                console.log = function(message) {
-                    var consoleOutput = document.getElementById('consoleOutput');
-                    if (consoleOutput) {
-                        consoleOutput.innerHTML += message + '<br>';
-                        consoleOutput.scrollTop = consoleOutput.scrollHeight;
-                    }
-                    oldConsoleLog.apply(console, arguments);
-                };
-            })();
-            </script>
+    <script>
+        (function () {
+            var oldConsoleLog = console.log;
+            console.log = function (message) {
+                var consoleOutput = document.getElementById('consoleOutput');
+                if (consoleOutput) {
+                    consoleOutput.innerHTML += message + '<br>';
+                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                }
+                oldConsoleLog.apply(console, arguments);
+            };
+        })();
+    </script>
 
     <script type="text/javascript">
         async function main() {
-           let pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/" });
+
+            let pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/" });
             console.log("Ready to run your program...");
             // numpy and matplitlib package
             await pyodide.loadPackage(['numpy', 'matplotlib']);
+            document.getElementById('spinner-container').style.display = 'none';
 
             var editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
                 lineNumbers: true,
@@ -98,8 +141,8 @@
                 document.getElementById('output-box-container').innerHTML = '';
 
                 try {
-                   // let output = pyodide.runPython(document.getElementById(code));
-                   const output = await pyodide.runPythonAsync(code);
+                    // let output = pyodide.runPython(document.getElementById(code));
+                    const output = await pyodide.runPythonAsync(code);
                     //const output = await pyodide.runPythonAsync(code);
                     displayOutput(output);
                 } catch (error) {
@@ -114,11 +157,15 @@
                 }
             });
 
-            
-             document.getElementById('clear-button').addEventListener('click', () => {
+
+            document.getElementById('clear-button').addEventListener('click', () => {
                 document.getElementById('consoleOutput').innerHTML = '';
             });
-            
+
+            document.getElementById('clear-editor').addEventListener('click', () => {
+                editor.setValue('');
+            });
+
             function displayOutput(output) {
                 const outputBox = document.getElementById('output-box-container');
                 outputBox.textContent = output;
