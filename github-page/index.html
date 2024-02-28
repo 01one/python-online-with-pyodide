@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        .editor-container {
+            margin-bottom: 20px;
+        }
+
+        #run-button,#clear-button,
+        #terminate-button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #output-box-container {
+            height: 100px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: rgb(245, 245, 245);
+        }
+
+        .console-output {
+            overflow-y: scroll;
+            height: 200px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #222;
+            color: #00FF00;
+            font-family: 'Lucida Console', 'Courier New', monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Python Online Interpreter</h1>
+    <div class="editor-container">
+        <textarea id="code-editor">print("Hello from Python!")</textarea>
+    </div>
+
+    <button id="run-button">Run</button>
+    <button id="terminate-button">Terminate</button>
+    <button id="clear-button">Clear Console</button>
+    <div class="console-output" id="consoleOutput"></div>
+    <div id="output-box-container"></div>
+        <script>
+            (function() {
+                var oldConsoleLog = console.log;
+                console.log = function(message) {
+                    var consoleOutput = document.getElementById('consoleOutput');
+                    if (consoleOutput) {
+                        consoleOutput.innerHTML += message + '<br>';
+                        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                    }
+                    oldConsoleLog.apply(console, arguments);
+                };
+            })();
+            </script>
+
+    <script type="text/javascript">
+        async function main() {
+           let pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/" });
+            console.log("Ready to run your program...");
+            // numpy and matplitlib package
+            await pyodide.loadPackage(['numpy', 'matplotlib']);
+
+            var editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+                lineNumbers: true,
+                mode: "python"
+            });
+
+            let runningProcess = null;
+
+            document.getElementById('run-button').addEventListener('click', async () => {
+                const code = editor.getValue();
+
+                document.getElementById('output-box-container').innerHTML = '';
+
+                try {
+                   // let output = pyodide.runPython(document.getElementById(code));
+                   const output = await pyodide.runPythonAsync(code);
+                    //const output = await pyodide.runPythonAsync(code);
+                    displayOutput(output);
+                } catch (error) {
+                    displayOutput('Error: ' + error.toString());
+                }
+            });
+
+            document.getElementById('terminate-button').addEventListener('click', () => {
+                if (runningProcess !== null) {
+                    runningProcess.destroy();
+                    runningProcess = null;
+                }
+            });
+
+            
+             document.getElementById('clear-button').addEventListener('click', () => {
+                document.getElementById('consoleOutput').innerHTML = '';
+            });
+            
+            function displayOutput(output) {
+                const outputBox = document.getElementById('output-box-container');
+                outputBox.textContent = output;
+            }
+        }
+        main();
+    </script>
+</body>
+
+</html>
