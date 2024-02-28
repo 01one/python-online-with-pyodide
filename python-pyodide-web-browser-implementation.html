@@ -8,7 +8,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
-  
 
     <style>
         body {
@@ -83,6 +82,7 @@
         async function main() {
            let pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/" });
             console.log("Ready to run your program...");
+            await pyodide.loadPackage(['numpy', 'matplotlib']);
 
             var editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
                 lineNumbers: true,
