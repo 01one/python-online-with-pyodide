@@ -48,6 +48,7 @@
             padding: 10px;
             background-color: #222;
             color: #00FF00;
+            white-space: pre-wrap;
             font-family: 'Lucida Console', 'Courier New', monospace;
         }
     </style>
@@ -70,7 +71,7 @@
                 console.log = function(message) {
                     var consoleOutput = document.getElementById('consoleOutput');
                     if (consoleOutput) {
-                        consoleOutput.innerHTML += message + '<br>';
+                        consoleOutput.textContent += message + '\n';
                         consoleOutput.scrollTop = consoleOutput.scrollHeight;
                     }
                     oldConsoleLog.apply(console, arguments);
