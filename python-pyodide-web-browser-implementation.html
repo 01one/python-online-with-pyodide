@@ -106,13 +106,6 @@
                 }
             });
 
-            document.getElementById('terminate-button').addEventListener('click', () => {
-                if (runningProcess !== null) {
-                    runningProcess.destroy();
-                    runningProcess = null;
-                }
-            });
-
             
              document.getElementById('clear-button').addEventListener('click', () => {
                 document.getElementById('consoleOutput').innerHTML = '';
